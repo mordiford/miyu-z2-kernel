@@ -69,12 +69,6 @@ int32_t msm_camera_cci_i2c_read_seq(struct msm_camera_i2c_client *client,
 		|| num_byte == 0)
 		return rc;
 
-	if (num_byte > I2C_REG_DATA_MAX) {
-			pr_err("%s: Error num_byte:0x%x exceeds 8K max supported:0x%x\n",
-			__func__, num_byte, I2C_REG_DATA_MAX);
-		return rc;
-	}
-
 	buf = kzalloc(num_byte, GFP_KERNEL);
 	if (!buf) {
 		pr_err("%s:%d no memory\n", __func__, __LINE__);
@@ -366,7 +360,6 @@ static int32_t msm_camera_cci_i2c_compare(struct msm_camera_i2c_client *client,
 	rc = msm_camera_cci_i2c_read(client, addr, &reg_data, data_len);
 	if (rc < 0)
 		return rc;
-
 	rc = I2C_COMPARE_MISMATCH;
 	switch (data_type) {
 	case MSM_CAMERA_I2C_BYTE_DATA:
