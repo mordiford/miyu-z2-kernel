@@ -512,12 +512,8 @@ static int msm_isp_get_buf(struct msm_isp_buf_mgr *buf_mgr, uint32_t id,
 		}
 		break;
 	case MSM_ISP_BUFFER_SRC_HAL:
-		if (MSM_ISP_INVALID_BUF_INDEX == buf_index)
 			vb2_buf = buf_mgr->vb2_ops->get_buf(
 				bufq->session_id, bufq->stream_id);
-		else
-			vb2_buf = buf_mgr->vb2_ops->get_buf_by_idx(
-				bufq->session_id, bufq->stream_id,  buf_index);
 		if (vb2_buf) {
 			if (vb2_buf->v4l2_buf.index < bufq->num_bufs) {
 				*buf_info = &bufq->bufs[vb2_buf
