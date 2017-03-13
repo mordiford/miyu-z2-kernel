@@ -34,6 +34,8 @@
 #include <linux/pinctrl/consumer.h>
 #include <linux/syscore_ops.h>
 
+#define HOME_KEY_CODE 102
+
 struct gpio_button_data {
 	const struct gpio_keys_button *button;
 	struct input_dev *input;
@@ -343,9 +345,11 @@ static void gpio_keys_gpio_report_event(struct gpio_button_data *bdata)
 
 	state = (__gpio_get_value(button->gpio) ? 1 : 0) ^ button->active_low;
 	pr_info("gpio_keys: code: %d, value, %d, state: %d\n", (int) button->code, (int) button->value, (int) state);
-
-	home_button_status = state;
-
+	
+	if ((int) button->code == HOME_KEY_CODE){ 
+		home_button_status = state;
+	}
+	
 	if (type == EV_ABS) {
 		if (state)
 			input_event(input, type, button->code, button->value);
