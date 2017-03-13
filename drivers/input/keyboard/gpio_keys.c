@@ -342,12 +342,10 @@ static void gpio_keys_gpio_report_event(struct gpio_button_data *bdata)
 	int state;
 
 	state = (__gpio_get_value(button->gpio) ? 1 : 0) ^ button->active_low;
-		pr_info("************home_button_key %d\n", (int) state);
-	if (state == 1) {
-		home_button_status = 1;
-	} else {
-		home_button_status = 0;
-	}
+	pr_info("gpio_keys: code: %d, value, %d, state: %d\n", (int) button->code, (int) button->value, (int) state);
+
+	home_button_status = state;
+
 	if (type == EV_ABS) {
 		if (state)
 			input_event(input, type, button->code, button->value);
@@ -1017,12 +1015,10 @@ static void __exit gpio_keys_exit(void)
 
 bool home_button_pressed(void)
 {
-	if (home_button_status == 1) {
-		return true;
-	}
-	else {
-		return false;
-	}
+	/*
+	* Used by drivers/misc/fpc1020_ree.c to check if home button if pressed.
+	*/
+	return home_button_status;
 }
 
 late_initcall(gpio_keys_init);

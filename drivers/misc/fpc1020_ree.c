@@ -81,7 +81,7 @@ static ssize_t irq_set(struct device* device,
 	else if (val == 0)
 		disable_irq(fpc1020->irq);
 	else
-		return -ENOENT; 
+		return -ENOENT;
 	return strnlen(buffer, count);
 }
 static DEVICE_ATTR(irq, S_IRUSR | S_IWUSR, irq_get, irq_set);
@@ -164,7 +164,7 @@ static ssize_t set_key(struct device* device,
 		if (val == KEY_HOME)
 			val = KEY_NAVI_LONG;  //Convert to U-touch long press keyValue
 		fpc1020->report_key = (int)val;
-		pr_info(" %d\n", (int)val);
+		pr_info("fpc1020_ree: key value: %d\n", (int)val);
 		queue_work(fpc1020->fpc1020_wq, &fpc1020->input_report_work);
 	} else
 		return -ENOENT;
@@ -199,23 +199,27 @@ static const struct attribute_group attribute_group = {
 	.attrs = attributes,
 };
 
+/*
+* From drivers/input/keyboard/gpio_keys.c
+*/
 extern bool home_button_pressed(void);
 
 static void fpc1020_report_work_func(struct work_struct *work)
 {
+	bool pressed;
 	struct fpc1020_data *fpc1020 = NULL;
 	fpc1020 = container_of(work, struct fpc1020_data, input_report_work);
-	if (fpc1020->screen_on == 1 && !home_button_pressed()) {
+
+	pressed = home_button_pressed();
+	pr_info("Key pressed (from gpio_keys) = %d\n", (int)pressed);
+	if (fpc1020->screen_on == 1 && !pressed) {
 			pr_info("Report key value = %d\n", (int)fpc1020->report_key);
-			pr_info("Report key pressed = %d\n", (int)home_button_pressed());
 			input_report_key(fpc1020->input_dev, fpc1020->report_key, 1);
 			mdelay(10);
   			input_sync(fpc1020->input_dev);
 			input_report_key(fpc1020->input_dev, fpc1020->report_key, 0);
 			input_sync(fpc1020->input_dev);
 			fpc1020->report_key = 0;
-		} else { 
-			pr_info("Report key pressed = %d\n", (int)home_button_pressed());	
 	}
 }
 
