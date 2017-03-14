@@ -56,6 +56,9 @@ struct gpio_keys_drvdata {
 	struct gpio_button_data data[0];
 };
 
+extern bool reset_gpio(void);
+
+
 static struct device *global_dev;
 static struct syscore_ops gpio_keys_syscore_pm_ops;
 
@@ -344,12 +347,10 @@ static void gpio_keys_gpio_report_event(struct gpio_button_data *bdata)
 	int state;
 
 	state = (__gpio_get_value(button->gpio) ? 1 : 0) ^ button->active_low;
-	pr_info("gpio_keys: code: %d, value, %d, state: %d\n", (int) button->code, (int) button->value, (int) state);
-	
-	if ((int) button->code == HOME_KEY_CODE){ 
-		home_button_status = state;
+	pr_info("key gpio value = %d active_low = %d  state=%d home_button_status=%d\n" , (int)__gpio_get_value(button->gpio),button->active_low,state, home_button_status);
+	if (state == 1) {
+		home_button_status = 1;
 	}
-	
 	if (type == EV_ABS) {
 		if (state)
 			input_event(input, type, button->code, button->value);
@@ -358,6 +359,13 @@ static void gpio_keys_gpio_report_event(struct gpio_button_data *bdata)
 	}
 	input_sync(input);
 }
+
+void reset_home_button(int i)
+{
+	home_button_status = i;
+	pr_info("key home button reset ok, home_button_status=%d",i);
+}
+
 
 static void gpio_keys_gpio_work_func(struct work_struct *work)
 {
@@ -1019,9 +1027,6 @@ static void __exit gpio_keys_exit(void)
 
 bool home_button_pressed(void)
 {
-	/*
-	* Used by drivers/misc/fpc1020_ree.c to check if home button if pressed.
-	*/
 	return home_button_status;
 }
 
