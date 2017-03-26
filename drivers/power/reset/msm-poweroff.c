@@ -335,7 +335,6 @@ static void msm_restart_prepare(const char *cmd)
 			enable_emergency_dload_mode();
 		} else if (!strncmp(cmd, "dload", 5)) {
 			set_dload_mode(1);
-			in_panic = 1;
 		} else {
 			__raw_writel(0x77665501, restart_reason);
 		}
