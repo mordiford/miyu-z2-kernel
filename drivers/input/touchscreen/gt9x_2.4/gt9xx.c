@@ -613,16 +613,16 @@ static void goodix_ts_work_func(struct work_struct *work)
         return;
     }
 #if GTP_GESTURE_WAKEUP
-    if (DOZE_ENABLED == doze_status)
-    {               
+    if (DOZE_DISABLED != doze_status)
+    {
         ret = gtp_i2c_read(i2c_connect_client, doze_buf, 3);
         GTP_DEBUG("0x814B = 0x%02X", doze_buf[2]);
         if (ret > 0)
-        {     
+        {
             if ((doze_buf[2] == 'a') || (doze_buf[2] == 'b') || (doze_buf[2] == 'c') ||
-                (doze_buf[2] == 'd') || (doze_buf[2] == 'e') || (doze_buf[2] == 'g') || 
+                (doze_buf[2] == 'd') || (doze_buf[2] == 'e') || (doze_buf[2] == 'g') ||
                 (doze_buf[2] == 'h') || (doze_buf[2] == 'm') || (doze_buf[2] == 'o') ||
-                (doze_buf[2] == 'q') || (doze_buf[2] == 's') || (doze_buf[2] == 'v') || 
+                (doze_buf[2] == 'q') || (doze_buf[2] == 's') || (doze_buf[2] == 'v') ||
                 (doze_buf[2] == 'w') || (doze_buf[2] == 'y') || (doze_buf[2] == 'z') ||
                 (doze_buf[2] == 0x5E) /* ^ */
                 )
