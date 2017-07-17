@@ -1362,7 +1362,7 @@ static int32_t msm_actuator_config(struct msm_actuator_ctrl_t *a_ctrl,
 {
 	struct msm_actuator_cfg_data *cdata =
 		(struct msm_actuator_cfg_data *)argp;
-	int32_t rc = -EINVAL;
+	int32_t rc = 0;
 	mutex_lock(a_ctrl->actuator_mutex);
 	CDBG("Enter\n");
 	CDBG("%s type %d\n", __func__, cdata->cfgtype);
@@ -1372,7 +1372,7 @@ static int32_t msm_actuator_config(struct msm_actuator_ctrl_t *a_ctrl,
 		a_ctrl->actuator_state == ACT_DISABLE_STATE) {
 		pr_err("actuator disabled %d\n", rc);
 		mutex_unlock(a_ctrl->actuator_mutex);
-		return rc;
+		return -EINVAL;
 	}
 
 	switch (cdata->cfgtype) {
@@ -1384,7 +1384,6 @@ static int32_t msm_actuator_config(struct msm_actuator_ctrl_t *a_ctrl,
 	case CFG_GET_ACTUATOR_INFO:
 		cdata->is_af_supported = 1;
 		cdata->cfg.cam_name = a_ctrl->cam_name;
-		rc = 0;
 		break;
 
 	case CFG_SET_ACTUATOR_INFO:
@@ -1394,19 +1393,15 @@ static int32_t msm_actuator_config(struct msm_actuator_ctrl_t *a_ctrl,
 		break;
 
 	case CFG_SET_DEFAULT_FOCUS:
-		if (a_ctrl->func_tbl &&
-			a_ctrl->func_tbl->actuator_set_default_focus)
-			rc = a_ctrl->func_tbl->actuator_set_default_focus(
-				a_ctrl, &cdata->cfg.move);
+		rc = a_ctrl->func_tbl->actuator_set_default_focus(a_ctrl,
+			&cdata->cfg.move);
 		if (rc < 0)
 			pr_err("move focus failed %d\n", rc);
 		break;
 
 	case CFG_MOVE_FOCUS:
-		if (a_ctrl->func_tbl &&
-			a_ctrl->func_tbl->actuator_move_focus)
-			rc = a_ctrl->func_tbl->actuator_move_focus(a_ctrl,
-				&cdata->cfg.move);
+		rc = a_ctrl->func_tbl->actuator_move_focus(a_ctrl,
+			&cdata->cfg.move);
 		if (rc < 0)
 			pr_err("move focus failed %d\n", rc);
 		break;
@@ -1417,10 +1412,8 @@ static int32_t msm_actuator_config(struct msm_actuator_ctrl_t *a_ctrl,
 		break;
 
 	case CFG_SET_POSITION:
-		if (a_ctrl->func_tbl &&
-			a_ctrl->func_tbl->actuator_set_position)
-			rc = a_ctrl->func_tbl->actuator_set_position(a_ctrl,
-				&cdata->cfg.setpos);
+		rc = a_ctrl->func_tbl->actuator_set_position(a_ctrl,
+			&cdata->cfg.setpos);
 		if (rc < 0)
 			pr_err("actuator_set_position failed %d\n", rc);
 		break;
@@ -1532,13 +1525,11 @@ static long msm_actuator_subdev_ioctl(struct v4l2_subdev *sd,
 			pr_err("a_ctrl->i2c_client.i2c_func_tbl NULL\n");
 			return -EINVAL;
 		}
-		mutex_lock(a_ctrl->actuator_mutex);
 		rc = msm_actuator_power_down(a_ctrl);
 		if (rc < 0) {
 			pr_err("%s:%d Actuator Power down failed\n",
 					__func__, __LINE__);
 		}
-		mutex_unlock(a_ctrl->actuator_mutex);
 		return msm_actuator_close(sd, NULL);
 	default:
 		return -ENOIOCTLCMD;

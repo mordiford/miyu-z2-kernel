@@ -282,12 +282,6 @@ int32_t msm_camera_cci_i2c_write_seq_table(
 	client_addr_type = client->addr_type;
 	client->addr_type = write_setting->addr_type;
 
-	if (reg_setting->reg_data_size > I2C_SEQ_REG_DATA_MAX) {
-		pr_err("%s: number of bytes %u exceeding the max supported %d\n",
-		__func__, reg_setting->reg_data_size, I2C_SEQ_REG_DATA_MAX);
-		return rc;
-	}
-
 	for (i = 0; i < write_setting->size; i++) {
 		rc = msm_camera_cci_i2c_write_seq(client, reg_setting->reg_addr,
 			reg_setting->reg_data, reg_setting->reg_data_size);
@@ -366,6 +360,7 @@ static int32_t msm_camera_cci_i2c_compare(struct msm_camera_i2c_client *client,
 	rc = msm_camera_cci_i2c_read(client, addr, &reg_data, data_len);
 	if (rc < 0)
 		return rc;
+
 	rc = I2C_COMPARE_MISMATCH;
 	switch (data_type) {
 	case MSM_CAMERA_I2C_BYTE_DATA:

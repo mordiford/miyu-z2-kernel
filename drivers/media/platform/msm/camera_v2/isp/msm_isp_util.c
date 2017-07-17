@@ -584,7 +584,6 @@ static int msm_isp_start_fetch_engine(struct vfe_device *vfe_dev,
 	 */
 	vfe_dev->axi_data.src_info[VFE_PIX_0].frame_id =
 		fe_cfg->frame_id;
-
 	return vfe_dev->hw_info->vfe_ops.core_ops.
 		start_fetch_eng(vfe_dev, arg);
 }
