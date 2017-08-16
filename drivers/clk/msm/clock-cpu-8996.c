@@ -30,7 +30,7 @@
 #include <linux/cpufreq.h>
 #include <linux/regulator/driver.h>
 
-#ifdef CONFIG_CPU_VOLTAGE_TABLE
+#ifndef CONFIG_VOLTAGE_CONTROL
 #include <linux/cpufreq.h>
 #endif
 
@@ -1202,7 +1202,7 @@ static int cpu_clock_8996_resources_init(struct platform_device *pdev)
 	return 0;
 }
 
-#ifdef CONFIG_CPU_VOLTAGE_TABLE
+#ifndef CONFIG_VOLTAGE_CONTROL
 
 #define CPU_VDD_MIN	 600
 #define CPU_VDD_MAX	1450
@@ -1372,7 +1372,7 @@ extern int cpr_regulator_get_last_voltage(struct regulator *regulator,int cori);
 extern int cpr_regulator_set_ceiling_voltage(struct regulator *regulator,int cori, int volt);
 extern int cpr_regulator_set_floor_voltage(struct regulator *regulator,int cori, int volt);
 extern int cpr_regulator_set_last_voltage(struct regulator *regulator,int cori, int volt);
-		
+
 ssize_t get_Voltages(char *buf)
 {
 	ssize_t count = 0;
@@ -1447,7 +1447,7 @@ ssize_t set_Voltages(const char *buf, size_t count)
 	if (!buf)
 		return -EINVAL;
 
-	for (i = 1; i < pwrcl_clk.c.num_fmax; i++) 
+	for (i = 1; i < pwrcl_clk.c.num_fmax; i++)
 	{
 		ret = sscanf(buf, "%d", &mv);
 		if (ret != 1)
@@ -1491,7 +1491,7 @@ ssize_t set_Voltages(const char *buf, size_t count)
         ret = sscanf(buf, "%s", line);
 		buf += strlen(line) + 1;
 	}
-	for (i = 1; i < perfcl_clk.c.num_fmax; i++) 
+	for (i = 1; i < perfcl_clk.c.num_fmax; i++)
 	{
 		ret = sscanf(buf, "%d", &mv);
 		if (ret != 1)
@@ -1506,7 +1506,7 @@ ssize_t set_Voltages(const char *buf, size_t count)
 
         ret = sscanf(buf, "%s", line);
 		buf += strlen(line) + 1;
-		
+
 		ret = sscanf(buf, "%d", &mv);
 		if (ret != 1)
 			return -EINVAL;
